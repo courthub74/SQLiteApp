@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQLite Frontend</title>
+
+    <!-- CSS -->
+     <style>
+        /* BODY */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 20em 0 0 19em;
+            background-color: black;
+            color: white;
+            padding: 20px;
+        }
+        /* INPUTS */
+        input {
+            background-color: rgb(43, 48, 53);
+            border: none;
+            color: lightslategray;
+            padding: 1em;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+        }
+        /* ADD USER BUTTON */
+        button {
+            background-color: lightslategray;
+            color: rgb(43, 48, 53);
+            padding: 1.3em;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+     </style>
+</head>
+<body>
+
+    <h1>SQLite User Database</h1>
+
+    <section>
+        <h2>Register User</h2>
+        <input type="text" id="firstname" placeholder="First Name:">
+        <input type="text" id="lastname" placeholder="Last Name:">
+        <button onclick="addUser()">Add User</button>
+    </section>
+
+    <!-- The JavaScript -->
+     <script>
+        console.log("sqlite3 is installed");
+        // require sqlite3
+        // const sqlite3 = require('sqlite3').verbose();
+        // declare the db
+        let db;
+        // Initialize sqlite db
+        async function initDatabase() {
+            // create the new database
+            db = new sqlite3.Database('./test.db', (err) => {
+                if (err) {
+                    console.error('Error connecting to the database', err);
+                } else {
+                    console.log('Connected to the SQLite database')
+                }
+            });
+            // create the users table
+            db.run(`CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY,
+                firstname TEXT NOT NULL,
+                lastname TEXT NOT NULL
+            )`);
+
+            // Initial load of users
+        }
+        
+        // Add the user 
+        function addUser() {
+            // query the firstname
+            const firstName = document.getElementById('firstname');
+            // trim white space accidentally entered (stored in new variable)
+            const first = firstName.value.trim();
+            // query the lastname
+            const lastName = document.getElementById('lastname');
+            // trim white space accidentally entered (stored in new variable)
+            const last = lastName.value.trim();
+
+            // force all inputs to get entered
+            if (!first || !last) {
+                alert('Please enter first AND last name');
+                return;
+            }
+
+            // Test print outputs
+            console.log(first);
+            console.log(last);
+            // Prints work
+
+            // prepare and run INSERT statement
+            const stmt = db.prepare(`INSERT INTO users (first, last) VALUES(?,?)`);
+            stmt.run([first, last]);
+            // stmt.free;
+
+            // clear inputs
+            firstName.value = '';
+            lastName.value = '';
+
+            // reload users
+            loadUsers();
+        }
+
+        // Load and display users
+        function loadUsers() {
+            // Query all users and print them to the console
+        }
+     </script>
+    
+</body>
+</html>
